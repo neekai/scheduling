@@ -8,8 +8,9 @@ import { CustomRequest } from '../types';
 const isAuthorized = async (req: CustomRequest, res: Response, next: NextFunction) => {
     const role = req.userRole;
     try {
-        const userId: string | undefined = req.body.userId || req.params.userId;
-        if (!role || !userId) throw new CustomError('User not found', 'user or role not found', 401);
+        const userId: string | undefined = req.body.userId || req.params.studentId || req.params.coachId;
+        // console.log('isAuthorized userId', req.params.userId);
+        if (!role || !userId) throw new CustomError('User or role not found', 'user or role not found', 401);
         await checkUserRole(userId, role);
         next();
     } catch(err) {

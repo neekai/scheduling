@@ -14,7 +14,7 @@ router.patch('/:studentId/reserve/:slotId', isAuthorized, studentController.rese
 router.get('/:studentId/:coachId/availability', isAuthorized, studentController.getCoachAvailableSlots)
 
 // view booked slots
-router.get('/:studentId/appointments', isAuthorized, studentController.getAppointments);
+router.get('/:studentId/appointments', isAuthorized, studentController.getUpcomingAppointments);
 
 // lands on home page and views all available slots for all coaches
 router.get('/:studentId', isAuthorized, studentController.getAllAvailableSlots);

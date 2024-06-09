@@ -1,18 +1,21 @@
-import { CreationOptional, Model, InferAttributes, InferCreationAttributes, ForeignKey } from "sequelize";
+import { CreationOptional, Model, InferAttributes, InferCreationAttributes, ForeignKey, HasOneSetAssociationMixin } from "sequelize";
 import { DataTypes } from "sequelize";
 import sequelize from "../util/database";
 import User from "./user";
+import Feedback from "./feedback";
 
 class Slot extends Model<InferAttributes<Slot>,InferCreationAttributes<Slot>> {
     declare id: CreationOptional<number>;
     declare startTime: Date;
     declare endTime: Date;
-    declare isBooked: Boolean;
-    declare completed: Boolean;
+    declare isBooked: CreationOptional<Boolean>;
+    declare completed: CreationOptional<Boolean>;
     declare coachId: ForeignKey<User['id']>;
     declare studentId: ForeignKey<User['id']>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+    
+    declare setFeedback: HasOneSetAssociationMixin<Feedback, 'id'>
 }
 
 Slot.init(

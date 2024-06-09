@@ -7,10 +7,8 @@ const checkUserRole = async (userId: string, role: Role): Promise<boolean> => {
         const user = await User.findByPk(Number(userId));
 
         if (!user) throw new CustomError('User not found', 'UserRoleValidationError', 401);
-
         if (user.role !== role) {
-            const error = new CustomError(`User is not a ${role}`, 'UserRoleValidationError', 403);
-            error.statusCode 
+            throw new CustomError(`User is not a ${role}`, 'UserRoleValidationError', 403);
         };
         return true;
 
