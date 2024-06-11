@@ -1,10 +1,12 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import helmet from 'helmet';
 import sequelize from './util/database';
 import { User, Slot, Feedback } from './models';
 import studentRoutes from './routes/learning';
 import coachRoutes from './routes/coaching';
+import authRoutes from './routes/login';
 import { Role } from './util/constants';
 import { CustomRequest } from './types';
 
@@ -13,7 +15,16 @@ import { CustomRequest } from './types';
 
 const app = express();
 
+const corsOptions = {
+    origin: '*', // Allow requests from this origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed methods
+    headers: 'Content-Type',
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
 app.use(helmet());
+app.use(cors(corsOptions))
 app.use(bodyParser.json());
 
 Slot.belongsTo(User, { as: Role.Coach });
@@ -26,13 +37,15 @@ User.hasMany(Slot, { as: 'bookedSlots', foreignKey: 'studentId' });
 Slot.hasOne(Feedback, { foreignKey: 'slotId' });
 Feedback.belongsTo(Slot, { foreignKey: 'slotId' });
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+// app.use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//     next();
+// });
 
+
+app.use('/login', authRoutes);
 
 app.use('/learning', (req, res, next) => {
     (req as CustomRequest).userRole = Role.Student;
@@ -71,8 +84,8 @@ sequelize
     // .sync({ force: true })
     .then(() => {
         console.log('database synchronized');
-        app.listen(3000, () => {
-            console.log('Server is running on port 3000')
+        app.listen(3001, () => {
+            console.log('Server is running on port 3001')
         });
     })
     .catch(err => {

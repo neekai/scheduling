@@ -17,7 +17,7 @@ router.get('/:studentId/:coachId/availability', isAuthorized, studentController.
 router.get('/:studentId/appointments', isAuthorized, studentController.getUpcomingAppointments);
 
 // lands on home page and views all available slots for all coaches
-router.get('/:studentId', isAuthorized, studentController.getAllAvailableSlots);
+router.get('/:studentId', isAuthorized, studentController.getAllCoaches);
 
 export default router;
       
