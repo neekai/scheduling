@@ -1,28 +1,19 @@
 import CoachInfo from "./CoachInfo";
 import { Button, Card, CardBody, CardFooter, VStack, useDisclosure } from "@chakra-ui/react";
+import { useNavigate } from 'react-router-dom';
 import Slot from "./Slot";
-import CoachAvailabilityModal from "./CoachOpenSlots";
+import CoachAvailabilityModal from "./CoachAvailabilityModal";
+import { CoachType } from "../types";
 
-interface CoachSlot {
-    id: number;
-    startTime: Date;
-    endTime: Date;
-}
-
-
-interface Coach {
-    id: number;
-    name: string;
-    phoneNumber: string;
-    coachSlots: CoachSlot[];
-}
 
 interface CoachInfoCardProps {
-    coach: Coach;
+    coach: CoachType;
 }
 
 const CoachInfoCard: React.FC<CoachInfoCardProps> = ({ coach }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const navigate = useNavigate();
+
     return (
         <>
             <Card 
@@ -40,7 +31,7 @@ const CoachInfoCard: React.FC<CoachInfoCardProps> = ({ coach }) => {
                     <CardBody pt='0'>
                         <VStack>
                         {
-                            coach.coachSlots.map((slot) => <Slot slot={slot} key={slot.id}/>)
+                            coach.coachSlots.map((slot) => <Slot slot={slot} key={slot.id} onClick={() => navigate(`reserve/${slot.id}`)}/>)
                         }
                         
                         </VStack>

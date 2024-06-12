@@ -81,8 +81,8 @@ router.post('/:coachId/slots', isAuthorized, [
 coachController.createSlot
 )
 
-// create feedback
-router.post('/:coachId/:slotId/feedback',
+// update or create feedback
+router.put('/:coachId/:slotId/feedback',
     [
         body('rating')
         .isNumeric().withMessage('Rating must be a number')
@@ -92,7 +92,7 @@ router.post('/:coachId/:slotId/feedback',
 );
 
 // lands on coach home page to view upcoming slots
-router.get('/:coachId', isAuthorized, coachController.getUpComingSlots);
+router.get('/:coachId', isAuthorized, coachController.getUpComingOpenSlots);
 
 export default router;
       

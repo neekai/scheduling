@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
+import { Text } from "@chakra-ui/react";
 import config from "../config";
 import useUser from "../hooks/useUser";
 import CoachInfoCard from "./CoachInfoCard";
+import { CoachType } from "../types";
 
-interface Coach {
-    id: number;
-    name: string;
-    phoneNumber: string;
-    coachSlots: [];
-}
 
 const Coaches: React.FC = () => {
-    const [coaches, setCoaches] = useState<Coach[] | null>(null);
+    const [coaches, setCoaches] = useState<CoachType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    // we can add pagination here
 
     const { user } = useUser();
 
@@ -30,17 +27,17 @@ const Coaches: React.FC = () => {
     };
 
     useEffect(() => {
-        if (!coaches) {
-            getCoaches();
-        };
+        getCoaches();
     }, [])
+
+    if (isLoading) return <Text>Loading Coaches...</Text>
+
+    if (coaches.length === 0) return <Text>No Coaches Found</Text>
 
     return (
         <>
             {
-                isLoading ? 
-                    <h1>Loading Coaches...</h1> :
-                    coaches?.map((coach) => <CoachInfoCard coach={coach} key={coach.id}/>)
+                coaches.map((coach) => <CoachInfoCard coach={coach} key={coach.id}/>)
             }
         </>
     )

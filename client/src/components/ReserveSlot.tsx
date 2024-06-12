@@ -15,20 +15,25 @@ interface Slot {
     startTime: Date;
     endTime: Date;
     coach: Coach;
-}
+};
+
+interface ReserveSlotProps {
+    userId: number;
+};
 
 
-const ReserveSlot: React.FC = () => {
+const ReserveSlot: React.FC<ReserveSlotProps> = ({ userId }) => {
     const [slot, setSlot] = useState<Slot | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isReserving, setIsReserving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const { studentId, slotId } = useParams();
+    const { slotId } = useParams();
     const navigate = useNavigate();
 
     const getSlot = async () => {
         try {
-            const data = await fetch(`${config.STUDENT_API_URL}/${studentId}/reserve/${slotId}`);
+            const data = await fetch(`${config.STUDENT_API_URL}/${userId}/reserve/${slotId}`);
             console.log('data', data)
             const slot = await data.json();
 
@@ -45,15 +50,22 @@ const ReserveSlot: React.FC = () => {
     const handleReserveSlot = async () => {
         try {
             setIsReserving(true);
-            await fetch(`${config.STUDENT_API_URL}/${studentId}/reserve/${slotId}`, {
+            const response = await fetch(`${config.STUDENT_API_URL}/${userId}/reserve/${slotId}`, {
                 method: 'PATCH',
             });
 
-            console.log('reserve slot success')
-            navigate(`/learning/${studentId}/appointments`, { replace: true })
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message)
+            }
+
+            navigate(`/learning`, { replace: true })
 
         } catch (err) {
-            console.log('Error reserving slot', err);
+            if (err instanceof Error) {
+                setError(err.message);
+                console.log('Error reserving slot', err);
+            }
         } finally {
             setIsReserving(false);
         }
@@ -69,6 +81,7 @@ const ReserveSlot: React.FC = () => {
                 isLoading ?
                     <h1>Fetching Slot...</h1> :
                     <Container maxW='md' centerContent>
+                        {error && <Text color="tomato" fontSize='24px'>{`Error: ${error}`}</Text>}
                         <VStack>
                             <Text>{slot?.coach.name}</Text>
                             <Text>{slot?.coach.phoneNumber}</Text>

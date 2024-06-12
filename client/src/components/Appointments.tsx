@@ -1,26 +1,30 @@
-import { Container, Stack } from "@chakra-ui/react";
+import { useState } from "react";
+import { Button, Container, Stack, Text } from "@chakra-ui/react";
 import useAppointments from "../hooks/useAppointments";
 import Appointment from "./Appointment";
 
 const Appointments = () => {
-    const { appointments, isLoading } = useAppointments();
+    const [currentPage, setCurrentPage] = useState(1);
+    const { appointments, isLoading, count, error } = useAppointments(currentPage);
+
+    if (isLoading) return <Text>Loading Appointments...</Text>
+
+    if (error) return <Text color='tomato'>{error}</Text>
 
     return (
-        <>
+        <Container mt='4'>
+            <Stack spacing='4'>
+                {
+                    appointments.map((appointment, index) => <Appointment appointment={appointment} key={index}/>)
+                }
+            </Stack>
             {
-                isLoading ? 
-                 <h1>Loading Appointments</h1> :
-                 <Container mt='4'>
-                    <Stack spacing='4'>
-                        {
-                            appointments.map((appointment, index) => <Appointment appointment={appointment} key={index}/>)
-                        }
-                    </Stack>
-                 </Container>
+                count && appointments.length < count ?
+                <Button onClick={() => setCurrentPage(prev => prev + 1)}>Load more appointments</Button> :
+                null
             }
-        </>
+        </Container>
     )
-
 };
 
 export default Appointments;

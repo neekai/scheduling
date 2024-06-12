@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Container, Button, Stack, Text } from "@chakra-ui/react";
 
 interface User {
     name: string;
@@ -25,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ switchUser }) => {
             
             const path = currentUser.role === 'student' ? '/learning' : '/coaching'
             console.log('currentUser', currentUser)
-            navigate(`${path}/${currentUser.id}`);
+            navigate(`${path}`);
 
         } catch (err) {
             console.log('err', err);
@@ -40,11 +41,14 @@ const Login: React.FC<LoginProps> = ({ switchUser }) => {
         <div>
             {
                 isLoading ? 
-                    <div> Loading... </div> : 
-                    <div>
-                        <button onClick={() => getUser('student')}>Continue as student</button>
-                        <button onClick={() => getUser('coach')}>Continue as coach</button>
-                    </div>
+                    <Text> Loading... </Text> : 
+                    <Container p='20'>
+                        <Stack>
+                            <Text textAlign='center' fontSize='large'>Pick a user</Text>
+                            <Button onClick={() => getUser('student')}>Continue as student</Button>
+                            <Button onClick={() => getUser('coach')}>Continue as coach</Button>
+                        </Stack>
+                    </Container>
             }
         </div>
     )

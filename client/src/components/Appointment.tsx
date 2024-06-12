@@ -26,6 +26,7 @@ const Appointment: React.FC<AppointmentProps> = ({ appointment }) => {
     const { user } = useUser();
 
     const name = user?.role === 'student' ? appointment.coach?.name : appointment.student?.name;
+    const phoneNumber = user?.role === 'student' ? appointment.coach?.phoneNumber : appointment.student?.phoneNumber;
 
     return (
         <Card>
@@ -34,6 +35,7 @@ const Appointment: React.FC<AppointmentProps> = ({ appointment }) => {
             </CardHeader>
             <CardBody>
                 <Stack>
+                    <Text>{`Phone number: ${phoneNumber}`}</Text>
                     <Text>{`Start Time: ${getFormattedTimeString(appointment.startTime)}`}</Text>
                     <Text>{`End Time: ${getFormattedTimeString(appointment.endTime)}`}</Text>
                 </Stack>

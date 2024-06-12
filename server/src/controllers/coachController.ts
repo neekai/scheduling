@@ -8,7 +8,7 @@ import { Role } from "../util/constants";
 import moment from 'moment';
 import { CustomCreateSlotRequest } from "../types";
 
-const getUpComingSlots = async (req: Request, res: Response, next: NextFunction) => {
+const getUpComingOpenSlots = async (req: Request, res: Response, next: NextFunction) => {
     const { page = 1, limit = 10 } = req.query;
 
     try {
@@ -30,20 +30,21 @@ const getUpComingSlots = async (req: Request, res: Response, next: NextFunction)
         //     order: [['startTime', 'ASC']]
         // })
 
-        const upcomingSlots = await Slot.findAndCountAll({
+        const upcomingOpenSlots = await Slot.findAndCountAll({
             where: {
-                coachId
+                coachId,
+                isBooked: false,
+                startTime: {
+                    [Op.gte]: Date.now()
+                } 
             },
-            include: [{
-                association: Role.Student,
-                attributes: ['name', 'phoneNumber']
-            }],
+            attributes: ['id', 'startTime', 'endTime'],
             order: [['startTime', 'ASC']],
             limit: Number(limit),
             offset
         });
 
-        res.status(200).json(upcomingSlots);
+        res.status(200).json(upcomingOpenSlots);
     } catch (err) {
         next(err);
     };
@@ -53,30 +54,13 @@ const getUpComingBookedSlots = async (req: Request, res: Response, next: NextFun
     const { page = 1, limit = 10 } = req.query;
 
     try {
+        if (!req.params.coachId) throw new CustomError('Coach Id not provided', 'GetUpComingBookedSlotsError', 400);
+
+
         const offset = getOffset(Number(page), Number(limit));
 
         const coachId: number = Number(req.params.coachId);
-        // const coach = await User.findByPk(coachId);
 
-        // if (!coach) throw new CustomError('Coach not found', 'GetUpComingBookedSlotsError', 404);
-
-        // const upcomingBookedSlots = await coach.getBookedSlots({
-        //     where: {
-        //         isBooked: true,
-        //         startTime: {
-        //             [Op.gte]: new Date()
-        //         },
-        //     },
-        //     include: [
-        //         {
-        //             association: 'bookedSlots',
-        //             attributes: ['name', 'phoneNumber']
-        //         }
-        //     ],
-        //     limit: Number(limit),
-        //     offset,
-        //     order: [['startTime', 'ASC']]
-        // })
 
         const upcomingBookedSlots = await Slot.findAndCountAll({
             where: {
@@ -128,10 +112,16 @@ const getCompletedSessions = async (req: Request, res: Response, next: NextFunct
                 isBooked: true,
                 completed: true,
             },
-            include: [{
-                association: Role.Student,
-                attributes: ['name', 'phoneNumber']
-            }],
+            include: [
+                {
+                    association: Role.Student,
+                    attributes: ['name', 'phoneNumber']
+                }, 
+                {
+                    model: Feedback,
+                    attributes: ['rating', 'notes']
+                }
+            ],
             order: [['startTime', 'DESC']],
             limit: Number(limit),
             offset
@@ -207,14 +197,25 @@ const createFeedback = async (req: Request, res: Response, next: NextFunction) =
             throw error;
         };
 
-        const feedback = await Feedback.create({
-            rating,
-            notes
+        const [feedback, created] = await Feedback.findOrCreate({
+            where: { slotId: slotId },
+            defaults: { rating, notes }
         });
 
-        await slot.setFeedback(feedback);
+        if (!created) {
+            feedback.rating = rating;
+            feedback.notes = notes;
+            await feedback.save();
+        };
 
-        res.status(201).json(feedback);
+        // const feedback = await Feedback.create({
+        //     rating,
+        //     notes
+        // });
+
+        // await slot.setFeedback(feedback);
+
+        res.status(created ? 201: 200).json({ feedback, message: "Feedback created successfully" });
 
     } catch (err) {
         next(err);
@@ -255,7 +256,7 @@ export default {
     getCompletedSession,
     getCompletedSessions,
     getUpComingBookedSlots,
-    getUpComingSlots,
+    getUpComingOpenSlots,
 }
 
 

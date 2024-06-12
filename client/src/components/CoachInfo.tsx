@@ -1,12 +1,9 @@
 import { Stack, Heading, Text } from "@chakra-ui/react";
+import { CoachType } from "../types";
 
-interface Coach {
-    name: string;
-    phoneNumber: string;
-}
 
 interface CoachInfoProps {
-    coach: Coach;
+    coach: CoachType;
 }
 
 const CoachInfo: React.FC<CoachInfoProps> = ({ coach }) => {

@@ -1,20 +1,12 @@
 import { createContext, useState, useContext, ReactNode } from 'react';
 import config from '../config';
+import { UserContextType, User } from '../types';
 
-interface User {
-    name: string;
-    id: number;
-    role: 'student' | 'coach';
-    phoneNumber: string;
-};
 
 interface UserProviderProps {
     children: ReactNode;
 };
-export interface UserContextType {
-    user: User | null;
-    switchUser: (useUser: 'student' | 'coach') => Promise<User>;
-}
+
 
 export const UserContext = createContext<UserContextType | null>(null);
 

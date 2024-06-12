@@ -82,28 +82,36 @@ const getCoachAvailableSlots = async (req: Request, res: Response, next: NextFun
 }
 
 const getUpcomingAppointments = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        // not doing pagination here because I am not expecting a student to have too many appointments
-        const studentId: number = Number(req.params.studentId);
-        const student = await User.findByPk(studentId);
-        if (!student) throw new CustomError('Student not found', 'GetUpcomingAppointmentsError', 404);
+    const { page = 1, limit = 10 } = req.query;
 
-        const userAppointments = await student.getBookedSlots({
+    try {
+        if (!req.params.studentId) throw new CustomError('Student Id not provided', 'GetUpcomingAppointmentsError', 400);
+
+        const offset = getOffset(Number(page), Number(limit));
+
+        const studentId: number = Number(req.params.studentId);
+        
+
+        const upcomingAppointments = await Slot.findAndCountAll({
             where: {
+                studentId,
                 isBooked: true,
                 completed: false,
                 startTime: {
-                    [Op.gte]: new Date()
-                }, 
+                    [Op.gte]: Date.now()
+                }
             },
-            include: {
+            include: [{
                 model: User,
-                as: Role.Coach
-            },
+                as: Role.Coach,
+                attributes: ['name', 'phoneNumber']
+            }],
             order: [['startTime', 'ASC']],
+            limit: Number(limit),
+            offset
         });
 
-        res.status(200).json(userAppointments)
+        res.status(200).json(upcomingAppointments)
     } catch (err) {
         next(err);
     }

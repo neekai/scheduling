@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,9 +9,7 @@ import coachRoutes from './routes/coaching';
 import authRoutes from './routes/login';
 import { Role } from './util/constants';
 import { CustomRequest } from './types';
-
-
-
+import { CustomError } from './util/customErrors';
 
 const app = express();
 
@@ -26,6 +24,7 @@ const corsOptions = {
 app.use(helmet());
 app.use(cors(corsOptions))
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 Slot.belongsTo(User, { as: Role.Coach });
 User.hasMany(Slot, { as: 'coachSlots', foreignKey: 'coachId' });
@@ -36,13 +35,6 @@ User.hasMany(Slot, { as: 'bookedSlots', foreignKey: 'studentId' });
 // Feedback
 Slot.hasOne(Feedback, { foreignKey: 'slotId' });
 Feedback.belongsTo(Slot, { foreignKey: 'slotId' });
-
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-//     next();
-// });
 
 
 app.use('/login', authRoutes);
@@ -56,6 +48,14 @@ app.use('/coaching', (req, res, next) => {
     (req as CustomRequest).userRole = Role.Coach;
     next();
 }, coachRoutes);
+
+app.use((error: CustomError, req: Request, res: Response, next: NextFunction) => {
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({ message: message, data: data, status });
+  });
 
 // async function createDummyUsers() {
 //     try {

@@ -1,25 +1,14 @@
 import { Button, Modal, ModalOverlay, ModalBody, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, VStack } from "@chakra-ui/react";
 import { useState, useEffect } from 'react';
-import { useParams } from "react-router";
+import { useNavigate } from "react-router";
+import useUser from "../hooks/useUser";
 import Slot from "./Slot";
 import config from "../config";
+import { CoachType } from "../types";
 
-interface CoachSlot {
-    id: number;
-    startTime: Date;
-    endTime: Date;
-}
-
-
-interface Coach {
-    id: number;
-    name: string;
-    phoneNumber: string;
-    coachSlots: CoachSlot[];
-}
 
 interface CoachAvailabilityModalProps {
-    coach: Coach;
+    coach: CoachType;
     onClose: () => void;
     isOpen: boolean;
 }
@@ -29,13 +18,14 @@ const CoachAvailabilityModal: React.FC<CoachAvailabilityModalProps> = ({ isOpen,
     const [openSlots, setOpenSlots] = useState(coach.coachSlots);
     const [isLoading, setIsLoading] = useState(false);
     const [totalCount, setTotalCount] = useState(null);
+    const { user } = useUser();
 
-    const { studentId } = useParams();
+    const navigate = useNavigate();
 
     const getMoreSlots = async (page: number) => {
         try {
             setIsLoading(true);
-            const data = await fetch(`${config.STUDENT_API_URL}/${studentId}/${coach.id}/availability?page=${page}`);
+            const data = await fetch(`${config.STUDENT_API_URL}/${user?.id}/${coach.id}/availability?page=${page}`);
             const result = await data.json();
             setTotalCount(result.count);
             console.log('result', result)
@@ -64,7 +54,7 @@ const CoachAvailabilityModal: React.FC<CoachAvailabilityModalProps> = ({ isOpen,
                 <ModalBody>
                     <VStack>
                         {
-                            openSlots.map((slot) => <Slot slot={slot} key={slot.id}/>)
+                            openSlots.map((slot) => <Slot slot={slot} key={slot.id} onClick={() => navigate(`reserve/${slot.id}`)}/>)
                         }
                     </VStack>
                 </ModalBody>
