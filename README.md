@@ -49,9 +49,3 @@ From there, you can continue as a coach or student and start scheduling appointm
 - PostgreSQL
 - Sequelize
 
-# Screenshots
-![Alt text](./studentHome.png)
-![Alt text](./studentAppointments.png)
-![Alt text](./CoachCompletedSessions.png)
-![Alt text](./CoachCompletedSessions.png)
-![Alt text](./createSlot.png)
