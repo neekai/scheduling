@@ -26,15 +26,15 @@ app.use(cors(corsOptions))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-Slot.belongsTo(User, { as: Role.Coach });
+Slot.belongsTo(User, { as: Role.Coach, onDelete: 'CASCADE' });
 User.hasMany(Slot, { as: 'coachSlots', foreignKey: 'coachId' });
 
-Slot.belongsTo(User, { as: Role.Student });
+Slot.belongsTo(User, { as: Role.Student, onDelete: 'CASCADE' });
 User.hasMany(Slot, { as: 'bookedSlots', foreignKey: 'studentId' });
 
 // Feedback
 Slot.hasOne(Feedback, { foreignKey: 'slotId' });
-Feedback.belongsTo(Slot, { foreignKey: 'slotId' });
+Feedback.belongsTo(Slot, { foreignKey: 'slotId', onDelete: 'CASCADE' });
 
 
 app.use('/login', authRoutes);

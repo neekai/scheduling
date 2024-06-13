@@ -50,6 +50,7 @@ Slot.init(
                 model: 'users',
                 key: 'id',
             },
+            onDelete: 'CASCADE'
         },
         studentId: {
             type: DataTypes.INTEGER,
@@ -58,6 +59,7 @@ Slot.init(
                 model: 'users',
                 key: 'id',
             },
+            onDelete: 'SET NULL'
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,

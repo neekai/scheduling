@@ -37,6 +37,7 @@ Feedback.init(
                 model: 'slots',
                 key: 'id'
             },
+            onDelete: 'CASCADE'
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
