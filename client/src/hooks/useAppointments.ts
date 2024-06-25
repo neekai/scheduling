@@ -6,7 +6,7 @@ import { Appointment } from "../types";
 
 const useAppointments = (page: number) => {
     const { user }= useUser();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [count, setCount] = useState(null);
     const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ const useAppointments = (page: number) => {
     const getAppointments = async (currentPage: number) => {
         const baseUrl = user?.role === 'student' ? config.STUDENT_API_URL : config.COACH_API_URL;
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const data = await fetch(`${baseUrl}/${user?.id}/appointments?page=${currentPage}`);
             const result = await data.json();
             setCount(result.count);

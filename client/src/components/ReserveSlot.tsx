@@ -59,7 +59,7 @@ const ReserveSlot: React.FC<ReserveSlotProps> = ({ userId }) => {
                 throw new Error(error.message)
             }
 
-            navigate(`/learning`, { replace: true })
+            navigate(`/learning/${userId}/appointments`, { replace: true })
 
         } catch (err) {
             if (err instanceof Error) {
